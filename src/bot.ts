@@ -14,9 +14,13 @@ import path from "node:path";
 import {MyContext} from "./types/context.interface";
 import { selectLanguageSceneFactory } from './scenes/select-language.scene';
 import {LANG} from "./constants";
+import { StateMachine, UserState } from "./state-machine";
+
 
 export default class DreamAnalyzerBot {
   private bot!: Telegraf<MyContext>;
+    private stateMachine: StateMachine;
+  
   private geminiAPI!: GeminiAPI;
   sceneManager!: SceneManager;
   private analyzeDreamStage = new Stage([
@@ -49,6 +53,8 @@ export default class DreamAnalyzerBot {
       this.sceneManager = new SceneManager();
 
       // Создаем бота
+            this.stateMachine = new StateMachine();
+      
       this.bot = new Telegraf<MyContext>(process.env.BOT_TOKEN);
 
       // Настраиваем middleware
@@ -88,12 +94,19 @@ export default class DreamAnalyzerBot {
   // Настройка обработчиков команд и событий
   setupHandlers() {
     // Команда start
-      this.bot.action('start', (ctx) => ctx.scene.enter('selectLanguageScene'));
-      this.bot.command('start', (ctx) => ctx.scene.enter('selectLanguageScene'));
-      this.bot.on('new_chat_members', (ctx) => ctx.scene.enter('selectLanguageScene'));
-
-    // Обработчик неизвестных команд
-    this.bot.on('message', (ctx: MyContext) => this.sceneManager.initialState(ctx));
+      t    // Команда start
+    this.bot.action('start', (ctx) => {
+      tis.stateMachine.reset();
+      ctx.scene.enter('selectLanguage');
+    });
+    this.bot.command('start', (ctx) => {
+      this.stateMachine.reset();
+      ctx.scene.enter('selectLanguage');
+    });
+    this.bot.on('new_chat_members', (ctx) => {
+      this.stateMachine.reset();
+      ctx.scene.enter('selectLanguage');
+    });
 
     // Обработка ошибок
     this.bot.catch((err: unknown, ctx) => {
