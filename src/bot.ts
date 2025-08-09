@@ -93,11 +93,11 @@ export default class DreamAnalyzerBot {
 
   // Настройка обработчиков команд и событий
   setupHandlers() {
-    // Команда start
-      t    // Команда start
+     // Команда start
     this.bot.action('start', (ctx) => {
-      tis.stateMachine.reset();
+      this.stateMachine.reset();
       ctx.scene.enter('selectLanguage');
+
     });
     this.bot.command('start', (ctx) => {
       this.stateMachine.reset();
